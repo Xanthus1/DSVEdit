@@ -13,10 +13,11 @@ class BGLayer
                 :layer_tiledata_ram_start_offset,
                 :tiles
   
-  def initialize(layer_metadata_ram_pointer, fs, overlay_id: nil)
+  def initialize(layer_metadata_ram_pointer, fs, overlay_id: nil, room: nil)
     @layer_metadata_ram_pointer = layer_metadata_ram_pointer
     @fs = fs
     @overlay_id = overlay_id
+    @room = room
   end
   
   def read_from_rom
@@ -39,7 +40,9 @@ class BGLayer
       @tileset_pointer,
       @collision_tileset_pointer,
       @layer_tiledata_ram_start_offset = fs.read(layer_metadata_ram_pointer, 16).unpack("CCvVVV")
-    
+      if !@room.nil?
+        print "{ 'sector':0x#{"%x" % @room.sector_index}, 'room':0x#{"%x" % @room.room_index}, 'type':'layer_metadata', 'start':0x#{"%.8x" % layer_metadata_ram_pointer}, 'end':0x#{"%.8x" % (layer_metadata_ram_pointer+16)} }, \n"
+      end
     if width > 15 || height > 15
       raise LayerReadError.new("Invalid layer size: #{width}x#{height}")
     end
@@ -56,6 +59,9 @@ class BGLayer
     end
     
     tile_data_string = fs.read(layer_tiledata_ram_start_offset, SIZE_OF_A_SCREEN_IN_BYTES*width*height)
+    if !@room.nil?
+      print "{ 'sector':0x#{"%x" % @room.sector_index}, 'room':0x#{"%x" % @room.room_index}, 'type':'layer_tiledata_ram_start_offset', 'start':0x#{"%.8x" % layer_tiledata_ram_start_offset}, 'end':0x#{"%.8x" % (layer_tiledata_ram_start_offset+SIZE_OF_A_SCREEN_IN_BYTES*width*height)} }, \n"
+    end
     @tiles = tile_data_string.unpack("v*").map do |tile_data|
       LayerTile.new.from_game_data(tile_data)
     end
@@ -246,6 +252,7 @@ class RoomLayer
       @z_index, @scroll_mode, @bg_control, 
         @width_in_pixels, @height_in_pixels,
         layer_metadata_ram_pointer = fs.read(layer_list_entry_ram_pointer, 12).unpack("CCvvvV")
+        print "{ 'sector':0x#{"%x" % room.sector_index}, 'room':0x#{"%x" % room.room_index}, 'type':'layer_list_metadata', 'start':0x#{"%.8x" % layer_list_entry_ram_pointer}, 'end':0x#{"%.8x" % (layer_list_entry_ram_pointer+12)} }, \n"
       @main_gfx_page_index = 0
       @opacity = 0x1F
       @palette_offset = 0
@@ -261,7 +268,7 @@ class RoomLayer
       end
     end
     
-    @bg_layer = BGLayer.new(layer_metadata_ram_pointer, fs, overlay_id: room.overlay_id)
+    @bg_layer = BGLayer.new(layer_metadata_ram_pointer, fs, overlay_id: room.overlay_id, room: room)
     bg_layer.read_from_rom()
   end
   

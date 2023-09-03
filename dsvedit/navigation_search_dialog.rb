@@ -17,6 +17,7 @@ class NavigationSearchDialog < Qt::Dialog
 
   def execute_search
     @rooms = []
+    @door_pointers = []
 
     room_pointer = @ui.room_pointer.text =~ /^\h+$/ ? @ui.room_pointer.text.to_i(16) : nil
     door_pointer = @ui.door_pointer.text =~ /^\h+$/ ? @ui.door_pointer.text.to_i(16) : nil
@@ -32,6 +33,7 @@ class NavigationSearchDialog < Qt::Dialog
         return
       end
       room.doors.each do |door|
+        @door_pointers << "0x%08X" % door.door_ram_pointer
         if door.door_ram_pointer == door_pointer
           parent.change_room_by_room_object(door.room)
           parent.open_door_editor(door)
@@ -39,6 +41,8 @@ class NavigationSearchDialog < Qt::Dialog
         end
       end
     end
+
+    print "doors = [#{@door_pointers.join(", ")}]"
     Qt::MessageBox.warning(self, "Room or Door not found", "Unable to find Door or Room with the provided pointer")
   end
 end

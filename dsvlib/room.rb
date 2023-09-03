@@ -59,6 +59,7 @@ class Room
   def read_from_rom
     if GAME == "aos"
       room_metadata = fs.read(room_metadata_ram_pointer, 36).unpack("vvVVVVVVVV")
+      print "{ 'sector':0x#{"%x" % sector_index}, 'room':0x#{"%x" % room_index}, 'type':'room_metadata', 'start':0x#{"%.8x" % room_metadata_ram_pointer}, 'end':0x#{"%.8x" % (room_metadata_ram_pointer+36)} }, \n"      
       @lcd_control = room_metadata[0]
       @state_swap_event_flag = room_metadata[1]
       @alternate_room_state_pointer = room_metadata[2]
@@ -158,6 +159,8 @@ class Room
       i += 1
     end
     
+    entity_list_ram_pointer_end = entity_list_ram_pointer + entities.length*12
+    print "{ 'sector':0x#{"%x" % sector_index}, 'room':0x#{"%x" % room_index}, 'type':'entity_list_ram_pointer', 'start':0x#{"%.8x" % entity_list_ram_pointer}, 'end':0x#{"%.8x" % (entity_list_ram_pointer_end+12)} }, \n"
     @original_number_of_entities = entities.length
   end
   
