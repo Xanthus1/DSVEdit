@@ -1461,6 +1461,16 @@ private
       when "CASTLEVANIA2A2CE"
         suppress_warnings { load './constants/gba_constants.rb' }
         suppress_warnings { load './constants/aos_constants.rb' }
+        # Detect Alter mod and use Alter constants if detected.
+        # Default Area List Offset contains code in Alter
+        area_list_offset = AREA_LIST_RAM_START_OFFSET-0x8000000
+        area_list_pointer = File.read(header_path, area_list_offset+0x4)[area_list_offset,0x4]
+        area_list_pointer_hex = area_list_pointer.unpack('H*').first.reverse
+        alter_hex_at_pointer = "00007407"
+        if area_list_pointer_hex == alter_hex_at_pointer then
+          print "Loading Alter."
+          suppress_warnings { load './constants/aos_alter_constants.rb' }
+        end
       when "CASTLEVANIA1ACHE"
         suppress_warnings { load './constants/gba_constants.rb' }
         suppress_warnings { load './constants/hod_constants.rb' }
