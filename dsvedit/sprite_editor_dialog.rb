@@ -4,6 +4,7 @@ require_relative 'ui_sprite_editor'
 class SpriteEditor < Qt::Dialog
   RED_PEN_COLOR = Qt::Pen.new(Qt::Color.new(255, 0, 0))
   GREEN_PEN_COLOR = Qt::Pen.new(Qt::Color.new(0, 255, 0))
+  BLUE_PEN_COLOR = Qt::Pen.new(Qt::Color.new(0, 0, 255))
   GREY_PEN_COLOR = Qt::Pen.new(Qt::Color.new(128, 128, 128))
   
   attr_reader :game, :fs
@@ -698,7 +699,8 @@ class SpriteEditor < Qt::Dialog
     if @ui.show_hitbox.checked
       frame.hitboxes.each_with_index do |hitbox, i|
         hitbox_item = Qt::GraphicsRectItem.new
-        hitbox_item.setPen(RED_PEN_COLOR)
+        hitbox_item.setPen(RED_PEN_COLOR) if i == 0
+        hitbox_item.setPen(BLUE_PEN_COLOR) if i == 1
         hitbox_item.setRect(hitbox.x_pos, hitbox.y_pos, hitbox.width, hitbox.height)
         @frame_graphics_scene.addItem(hitbox_item)
       end
@@ -1032,6 +1034,19 @@ class SpriteEditor < Qt::Dialog
     end
     
     output_folder = "./darkfunction_sprites/#{sprite_name}"
+    
+    if File.directory?(output_folder) && !Dir.empty?(output_folder)
+      response = Qt::MessageBox.question(
+        self,
+        "Confirm overwrite",
+        "A sprite already exists at #{output_folder}.\nAre you sure you want to overwrite it?",
+        Qt::MessageBox::No | Qt::MessageBox::Yes, Qt::MessageBox::No
+      )
+      if response == Qt::MessageBox::No
+        return
+      end
+    end
+    
     FileUtils.mkdir_p(output_folder)
     
     DarkFunctionInterface.export(
