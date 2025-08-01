@@ -688,8 +688,16 @@ class Game
           included_file_path = File.join(patch_file_dir, included_file_name)
           FileUtils.cp(included_file_path, tmpdir)
         end
+        if line =~ /.import "([^"]+)"/
+          imported_file_name = $1
+          imported_file_path = File.join(patch_file_dir, imported_file_name)
+          FileUtils.cp(imported_file_path, tmpdir)
+        end
       end
       
+      if !File.exist?("./armips/armips.exe")
+        raise "ARMips not found. If running from source, view 'Running from source' instructions in README.md"
+      end
       stdout, stderr, status = Open3.capture3("./armips/armips.exe \"#{temp_patch_file}\"")
       if !status.success?
         if ENV["PROCESSOR_ARCHITECTURE"] == "AMD64"
