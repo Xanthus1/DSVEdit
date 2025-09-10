@@ -217,7 +217,9 @@
     0 Full of money.
     1 Full of Rippers.
 19 Skull that moves around in a rectangular path.
-  Var A: Width in pixels of the path it moves around on.
+  Var A (Reprise Code change):
+    Lower byte: Width in pixels of the path it moves around on.
+    Higher byte: Height in pixels of the path it moves around on. If this is set to 0, it defaults to 0x10 for vanilla behavior.
   Var B: Direction.
     0 Clockwise
     1 Counterclockwise

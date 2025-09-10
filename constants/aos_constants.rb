@@ -194,7 +194,10 @@ TEXT_REGIONS = {
   "Music Names" => (0x393..0x3AF),
   "Menus 2" => (0x3B0..0x3B6),
   "Uncategorized" => (0x3B7..0x3C3),
-  "French" => (0x3C4..0xB87),
+  "French and Reprise" => (0x3C4..0x40F),
+  "Reprise Ability Soul Names" => (0x410..0x417),
+  "Reprise Ability Soul Descriptions" => (0x418..0x41F),
+  "French (remaining)" => (0x420..0xB87),
   "German" => (0x788..0xB4B),
   "Language Names" => (0xB4C..0xB4E),
 }
